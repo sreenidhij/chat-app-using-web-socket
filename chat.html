@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9; /* Light gray background */
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #f0a3a3; /* Pastel red */
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .message-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 300px;
+            padding: 10px;
+        }
+
+        .message-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sent {
+            text-align: right;
+            color: #fff;
+            background-color: #90ced6; /* Pastel blue-green */
+        }
+
+        .sent .message-text {
+            background-color: #90ced6; /* Pastel blue-green */
+            color: #fff;
+        }
+
+        .received {
+            text-align: left;
+            background-color: #f3e9d2; /* Pastel yellow */
+        }
+
+        .received .message-text {
+            background-color: #f3e9d2; /* Pastel yellow */
+        }
+
+        .message-text {
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .send-button {
+            padding: 8px 15px;
+            background-color: #f0a3a3; /* Pastel red */
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('message', function (msg) {
+            displayMessage(msg, 'received');
+        });
+
+        function sendMessage() {
+            var input = document.getElementById('message_input');
+            var message = input.value;
+            displayMessage(message, 'sent');
+            socket.emit('message', message);
+            input.value = '';
+        }
+
+        function displayMessage(msg, type) {
+            var ul = document.getElementById('messages');
+            var li = document.createElement('li');
+            li.classList.add(type);
+            var messageText = document.createElement('div');
+            messageText.classList.add('message-text');
+            messageText.appendChild(document.createTextNode(msg));
+            li.appendChild(messageText);
+            ul.appendChild(li);
+        }
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>WebSocket Chat</h2>
+        </div>
+        <ul id="messages" class="message-list"></ul>
+        <div class="input-container">
+            <input id="message_input" class="message-input" autocomplete="off" placeholder="Type your message...">
+            <button onclick="sendMessage()" class="send-button">Send</button>
+        </div>
+    </div>
+</body>
+</html>
